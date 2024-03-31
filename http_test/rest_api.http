@@ -1,0 +1,43 @@
+### 知识库列表
+GET http://{{ip}}:{{port}}/doc/semantic-doc/lib/page?pageNumber=1&pageSize=12
+
+### 分类列表
+POST http://{{ip}}:{{port}}/doc/semantic-doc/category/list
+Accept: */*
+Content-Type: application/json;charset=UTF-8
+
+{
+  "libId": "7bd6aa838b66418f9f7166b35fea757e",
+  "name": "",
+  "version": 1
+}
+
+### 文档分页查询
+POST http://133.96.21.202:18080/xf-knowledgebase/doc/semantic-doc/document/page
+Accept: */*
+Content-Type: application/json;charset=UTF-8
+
+{
+    "libId": "683a663277fa4e64b5148304bbe23e7c",
+    "version": 2,
+    "category": "3e5a5c49f74848ee8f55111407db6dd4",
+    "pageSize": 999,
+    "pageNumber": 1
+}
+
+
+### 文档列表
+POST http://{{ip}}:{{port}}/doc/semantic-doc/document/list
+Accept: */*
+Content-Type: application/json;charset=UTF-8
+
+{
+    "libId": "b221532912e04db4ac4f0f826f278da0",
+    "version": 2
+}
+
+
+### 文档内容查询
+GET http://{{ip}}:{{port}}/doc/semantic-doc/document/{文档id}
+
+
