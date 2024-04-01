@@ -52,11 +52,11 @@ public class WordAnalyse {
 
     public static void main(String[] args) {
         File[] files = new File[5];
-        files[0] = new File("D:/temp/提取/简历1.docx");
-        files[1] = new File("D:/temp/提取/简历2.docx");
-        files[2] = new File("D:/temp/提取/简历3.docx");
-        files[3] = new File("D:/temp/提取/简历4.docx");
-        files[4] = new File("D:/temp/提取/简历5.docx");
+        files[0] = new File("/Users/wf/Documents/简历验证/简历1.docx");
+        files[1] = new File("/Users/wf/Documents/简历验证/简历2.docx");
+        files[2] = new File("/Users/wf/Documents/简历验证/简历3.docx");
+        files[3] = new File("/Users/wf/Documents/简历验证/简历4.docx");
+        files[4] = new File("/Users/wf/Documents/简历验证/简历5.docx");
         FileInputStream fis = null;
         XWPFDocument document = null;
 
@@ -316,7 +316,6 @@ public class WordAnalyse {
 
                 // 项目经历相关内容处理
                 ArrayList<ResumeInfo.ProjectInfo> projectInfos = new ArrayList<>();
-                Pattern projectNamePattern1 = Pattern.compile("^(\\d{4}.\\d{2}-\\d{4}.\\d{2}\\s+){0,}(\\S+)$");
 
                 int template = 0;
                 if (projectInfoStartIndex > 0) {
@@ -330,12 +329,17 @@ public class WordAnalyse {
                         }
                         if (paraText.startsWith("技术栈：")) {
                             template = 4;
+                            break;
                         }
                         if (paraText.startsWith("项目职责：")) {
                             template = 5;
+                            break;
                         }
                     }
+                    System.out.println(template);
                     if (template == 1) {
+//                        Pattern projectNamePattern1 = Pattern.compile("^(.+)$");
+                        Pattern projectNamePattern1 = Pattern.compile("^(\\d{4}.\\d{2}-\\d{4}.\\d{2}\\s+){0,}(\\S+)$");
                         ResumeInfo.ProjectInfo projectInfo = null;
                         StringBuffer responsibilitiesSbf = new StringBuffer();
                         boolean responsibilitiesFlag = false;
@@ -351,6 +355,7 @@ public class WordAnalyse {
                                     if (!"描述：".equals(paraText)) {
                                         if (projectInfo != null) {
                                             projectInfo.setResponsibilities(responsibilitiesSbf.toString());
+                                            responsibilitiesSbf = new StringBuffer();
                                             responsibilitiesFlag = false;
                                         }
                                         projectInfo = new ResumeInfo.ProjectInfo();
@@ -396,6 +401,61 @@ public class WordAnalyse {
                         if (projectInfo != null) {
                             projectInfo.setResponsibilities(responsibilitiesSbf.toString());
                             responsibilitiesFlag = false;
+                        }
+                    }
+                    if (template == 5) {
+                        Pattern projectNamePattern5 = Pattern.compile("^(.+)$", Pattern.MULTILINE);
+                        Pattern responsibilitiesPattern5 = Pattern.compile("^项目职责：(.+)$", Pattern.MULTILINE);
+                        ResumeInfo.ProjectInfo projectInfo = null;
+                        StringBuffer responsibilitiesSbf = new StringBuffer();
+                        for (int j = projectInfoStartIndex + 1; j <= projectInfoEndIndex; j++) {
+                            IBodyElement bodyElement = bodyElements.get(j);
+                            XWPFParagraph para = (XWPFParagraph) bodyElement;
+                            String paraText = analyseParaText(bodyElement);
+//                            System.out.println(paraText);
+//                            System.out.println("------");
+                            boolean flag = false;
+                            for (XWPFRun run : para.getRuns()) {
+                                CTRPr fontProperties = run.getCTR().getRPr();
+                                CTOnOff b = fontProperties.getB();
+                                if (b != null) {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+
+                            if (flag) {
+//                                System.out.println(paraText);
+                                projectInfo = new ResumeInfo.ProjectInfo();
+                                Matcher matcher = projectNamePattern5.matcher(paraText);
+                                while (matcher.find()) {
+                                    projectInfo.setProjectName(matcher.group(1));
+                                }
+                            } else {
+                                Matcher matcher = responsibilitiesPattern5.matcher(paraText);
+                                while (matcher.find()) {
+                                    projectInfo.setResponsibilities(matcher.group(1));
+                                    projectInfos.add(projectInfo);
+                                }
+                            }
+
+/*                        for (XWPFRun run : para.getRuns()) {
+                            CTRPr fontProperties = run.getCTR().getRPr();
+                            CTOnOff b = fontProperties.getB();
+                            if (b != null && b.getVal() == STOnOff.ON) {
+                                System.out.println(123412);
+                                if (!paraText.contains("描述")) {
+                                    System.out.println(1234);
+                                    // 项目名index
+                                    Matcher matcher = projectNamePattern1.matcher(paraText);
+                                    while (matcher.find()) {
+                                        System.out.println(matcher.group(2));
+                                    }
+//                                    projectInfo.setProjectName()
+
+                                }
+                            }
+                        }*/
                         }
                     }
                 }

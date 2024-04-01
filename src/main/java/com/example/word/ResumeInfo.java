@@ -331,7 +331,7 @@ public class ResumeInfo {
         sbf = new StringBuffer();
         for (int i = 0; i < projectInfos.size(); i++) {
             ProjectInfo pInfo = projectInfos.get(i);
-            String eduInfo = String.format("\n\n工作经历%d:" +
+            String eduInfo = String.format("\n\n项目经历%d:" +
                             "\n\t项目名称：" +
                             "\n\t\t%s" +
                             "\n\t项目职责：" +
